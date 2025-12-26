@@ -1,19 +1,27 @@
-name: BrowserStack LCA
+name: BrowserStack LCA Run
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:    # Allows manual trigger
+  push:
+    branches:
+      - main          # Optional: trigger on main branch pushes
 
 jobs:
   run-lca:
     runs-on: ubuntu-latest
+    container:
+      image: browserstack/browserstack-cli:latest   # Official BrowserStack CLI Docker image
+
     steps:
       - name: Run BrowserStack LCA
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-        run: 
-          npx @browserstack/cli lca run
+        run: |
+          # Trigger Low-Code Automation test run
+          browserstack lca run
             --project "SwagLabs"
-            --test-run-name "Trigger LCA Run"
+            --test-run-name "Trigger LCA Run #${{ github.run_number }}"
             --test-cases "TC-138,TC-146"
+            --build-name "gha-${{ github.run_number }}"
 
